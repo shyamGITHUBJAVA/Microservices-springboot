@@ -14,8 +14,8 @@ public class AppConfig {
 //        return new RestTemplate();
 //    }
 
-    @Bean
-    public WebClient.Builder webClientBuilder() {
-        return WebClient.builder();
-    }
+//    @Bean
+//    public WebClient.Builder webClientBuilder() {
+//        return WebClient.builder();
+//    }
 }

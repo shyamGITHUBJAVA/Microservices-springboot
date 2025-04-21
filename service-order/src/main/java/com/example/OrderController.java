@@ -3,6 +3,8 @@ package com.example;
 
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -12,7 +14,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/orders")
 public class OrderController {
 //
 //    @Autowired
@@ -34,38 +36,50 @@ public class OrderController {
 //        }
 //    }
 
+//
 
-    private final WebClient.Builder webClientBuilder;
+//    @Autowired
+//    private InventoryFeignClient inventoryFeignClient;
+//    @PostMapping
+//    public String placeOrder(@RequestBody OrderRequest orderRequest) {
+//        List<String> skuCodes = orderRequest.getOrderLineItemsDtoList().stream()
+//                .map(OrderLineItemsDto::getSkuCode)
+//                .toList();
+//
+//        List<InventoryResponse> inventoryResponses = inventoryFeignClient.checkInventory(skuCodes);
+//
+//        boolean allInStock = orderRequest.getOrderLineItemsDtoList().stream()
+//                .allMatch(orderItem ->
+//                        inventoryResponses.stream()
+//                                .filter(inv -> inv.getSkuCode().equals(orderItem.getSkuCode()))
+//                                .findFirst()
+//                                .map(inv -> inv.getQuantity() >= orderItem.getQuantity())
+//                                .orElse(false)
+//                );
+//
+//        return allInStock ? "Order Placed Successfully" : "One or more items are out of stock";
+//    }
 
-    public OrderController(WebClient.Builder webClientBuilder) {
-        this.webClientBuilder = webClientBuilder;
-    }
 
+    @Autowired
+    private OrderProducer orderProducer;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @PostMapping
-    public Mono<String> placeOrder(@RequestBody OrderRequest orderRequest) {
-        // Create a list of Mono checks for each item in the order
-        List<Mono<Boolean>> stockChecks = orderRequest.getOrderLineItemsDtoList().stream()
-                .map(item -> {
-                    String url = "http://localhost:8082/api/inventory?skuCode=" + item.getSkuCode();
-                    // Make asynchronous request using WebClient
-                    return webClientBuilder.build()
-                            .get()
-                            .uri(url)
-                            .retrieve()
-                            .bodyToMono(InventoryResponse[].class)
-                            .map(responses -> responses != null && responses.length > 0 &&
-                                    responses[0].getQuantity() >= item.getQuantity());
-                })
-                .toList();
-
-        // Combine all the stock checks and verify that all are true (i.e., all items are in stock)
-        return Mono.zip(stockChecks, results -> {
-            boolean allInStock = true;
-            for (Object result : results) {
-                allInStock &= (Boolean) result;
-            }
-            return allInStock ? "Order Placed Successfully" : "One or more items are out of stock";
-        });
+    public String placeOrder(@RequestBody OrderRequest orderRequest) {
+        String orderJson = convertOrderToJson(orderRequest);  // Assume you have a method to convert the order to JSON
+        orderProducer.sendOrderToInventory(orderJson);
+        return "Order placed and sent to Inventory Service for stock check";
     }
+
+    private String convertOrderToJson(OrderRequest orderRequest) {
+        try {
+            return objectMapper.writeValueAsString(orderRequest);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to convert order to JSON", e);
+        }
+    }
+
 }
