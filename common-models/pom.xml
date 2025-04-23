@@ -26,6 +26,7 @@
             <scope>provided</scope>
         </dependency>
 
+
         <!-- Optional: add validation API -->
         <dependency>
             <groupId>jakarta.validation</groupId>

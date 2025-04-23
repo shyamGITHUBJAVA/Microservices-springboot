@@ -9,10 +9,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class AppConfig {
-//    @Bean
-//    public RestTemplate restTemplate() {
-//        return new RestTemplate();
-//    }
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 
 //    @Bean
 //    public WebClient.Builder webClientBuilder() {

@@ -61,25 +61,17 @@ public class OrderController {
 //    }
 
 
-    @Autowired
-    private OrderProducer orderProducer;
+        @Autowired
+        private OrderService orderService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @PostMapping
-    public String placeOrder(@RequestBody OrderRequest orderRequest) {
-        String orderJson = convertOrderToJson(orderRequest);  // Assume you have a method to convert the order to JSON
-        orderProducer.sendOrderToInventory(orderJson);
-        return "Order placed and sent to Inventory Service for stock check";
-    }
-
-    private String convertOrderToJson(OrderRequest orderRequest) {
-        try {
-            return objectMapper.writeValueAsString(orderRequest);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to convert order to JSON", e);
+        @PostMapping
+        public String placeOrder(@RequestBody OrderRequest orderRequest) {
+            return orderService.placeOrder(orderRequest);
         }
-    }
+
 
 }
+
+
+
+
