@@ -48,5 +48,5 @@ jobs:
       - name: Run container from image
         uses: addnab/docker-run-action@v3
         with:
-          image: nginx:latest
+          image: shyam583/service-inventory:latest # Use the built image from the build job
           options: -d -p 8082:8082
