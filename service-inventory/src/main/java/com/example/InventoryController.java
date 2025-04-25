@@ -23,7 +23,7 @@ public class InventoryController {
 
     @GetMapping("/hello")
     public String helloMethod(){
-        return "hello from app and this is shyam working on jenkins";
+        return "hello from app and this is shyam working on deployment";
     }
 
     @PostMapping("/reserve")
