@@ -46,8 +46,8 @@ jobs:
     runs-on: [aws-ec2]
     steps:
       - name: Pull Image from docker hub
-        run: docker pull integrationninjas/springboot-example:latest
+        run: docker pull shyam583/service-inventory:latest
       - name: Delete old container
-        run: docker rm -f springboot-example-container
+        run: docker rm -f springboot-example
       - name: Run docker container
-        run: docker run -d -p 8080:8080 --name springboot-example-container integrationninjas/springboot-example
+        run: docker run -d -p 8082:8082 --name springboot-example shyam583/service-inventory
