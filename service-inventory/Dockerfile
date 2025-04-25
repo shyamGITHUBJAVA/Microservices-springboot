@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # 3. Copy the JAR file from your build folder
-COPY target/inventory-service.jar inventory-service.jar
+COPY service-inventory/target/inventory-service.jar inventory-service.jar
 
 # 4. Expose port (same as your app's server.port, usually 8080)
 EXPOSE 8082
