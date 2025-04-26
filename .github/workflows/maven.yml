@@ -45,7 +45,7 @@ jobs:
           $status = minikube status
           if ($status -notmatch "Running") {
               Write-Host "Minikube not running, starting it..."
-              minikube start --driver=hyperv --memory=4g --cpus=2
+              minikube start --driver=hyperv
           } else {
               Write-Host "Minikube already running."
           }
