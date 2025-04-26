@@ -46,15 +46,17 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Set up kubectl for Minikube
+      - name: Ensure Minikube is running
+        shell: powershell
         run: |
-          if ! minikube status | findstr /C:"Running" >nul; then
-            echo "Minikube not running, starting now..."
+          $status = minikube status
+          if ($status -notmatch "Running") {
+            Write-Host "Minikube not running, starting it..."
             minikube start
-          else
-            echo "Minikube already running."
-          fi
-          kubectl config use-context minikube
+          } else {
+            Write-Host "Minikube already running."
+          }
+          kubectl config use-context minikube  
 
       - name: Update Kubernetes Deployment
         run: |
