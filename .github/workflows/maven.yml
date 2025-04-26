@@ -44,10 +44,23 @@ jobs:
   deploy:
     needs: build
     runs-on: self-hosted
+
     steps:
-      - name: Pull Image from docker hub
-        run: docker pull shyam583/service-inventory:latest
-      - name: Delete old container
-        run: docker rm -f springboot-example
-      - name: Run docker container
-        run: docker run -d -p 8082:8082 --name springboot-example shyam583/service-inventory
+      - name: Set up kubectl for Minikube
+        run: |
+          if ! minikube status | findstr /C:"Running" >nul; then
+            echo "Minikube not running, starting now..."
+            minikube start
+          else
+            echo "Minikube already running."
+          fi
+          kubectl config use-context minikube
+
+      - name: Update Kubernetes Deployment
+        run: |
+          kubectl set image deployment/springboot-example springboot-example=shyam583/service-inventory:latest || \
+          (kubectl create deployment springboot-example --image=shyam583/service-inventory:latest && \
+          kubectl expose deployment springboot-example --type=NodePort --port=8082 --target-port=8082)
+
+      - name: Show Service URL
+        run: minikube service springboot-example --url
