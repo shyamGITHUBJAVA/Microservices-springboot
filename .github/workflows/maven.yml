@@ -59,7 +59,7 @@ jobs:
             kubectl create deployment springboot-example --image=shyam583/service-inventory:latest
             kubectl expose deployment springboot-example --type=NodePort --port=8082 --target-port=8082
           } else {
-            kubectl set image deployment/springboot-example springboot-example=shyam583/service-inventory:latest
+            kubectl set image deployment/springboot-example service-inventory=shyam583/service-inventory:latest
           }
 
       - name: Wait for Pods to be ready
