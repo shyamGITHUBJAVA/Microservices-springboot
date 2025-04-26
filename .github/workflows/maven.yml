@@ -52,7 +52,7 @@ jobs:
           $status = minikube status
           if ($status -notmatch "Running") {
             Write-Host "Minikube not running, starting it..."
-            minikube start
+            minikube start --driver=docker
           } else {
             Write-Host "Minikube already running."
           }
