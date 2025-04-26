@@ -44,24 +44,28 @@ jobs:
         run: |
           $status = minikube status
           if ($status -notmatch "Running") {
-            Write-Host "Minikube not running, starting it..."
-            minikube start --driver=hyperv --memory=4g --cpus=2
+              Write-Host "Minikube not running, starting it..."
+              minikube start --driver=hyperv --memory=4g --cpus=2
           } else {
-            Write-Host "Minikube already running."
+              Write-Host "Minikube already running."
           }
-
+          
           # Ensure kubectl is using Minikube context
-          kubectl config use-context minikube || kubectl config set-context minikube --cluster=minikube --user=minikube
+          try {
+              kubectl config use-context minikube
+          } catch {
+              kubectl config set-context minikube --cluster=minikube --user=minikube
+          }
 
       - name: Update Kubernetes Deployment
         shell: powershell
         run: |
           $deployment = kubectl get deployment springboot-example --ignore-not-found
           if (-not $deployment) {
-            kubectl create deployment springboot-example --image=shyam583/service-inventory:latest
-            kubectl expose deployment springboot-example --type=NodePort --port=8082 --target-port=8082
+              kubectl create deployment springboot-example --image=shyam583/service-inventory:latest
+              kubectl expose deployment springboot-example --type=NodePort --port=8082 --target-port=8082
           } else {
-            kubectl set image deployment/springboot-example service-inventory=shyam583/service-inventory:latest
+              kubectl set image deployment/springboot-example service-inventory=shyam583/service-inventory:latest
           }
 
       - name: Wait for Pods to be ready
