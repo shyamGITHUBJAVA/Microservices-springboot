@@ -42,14 +42,14 @@ jobs:
       - name: Ensure Minikube is running
         shell: powershell
         run: |
-          $status = minikube status
+          $status = minikube status --driver=hyperv
           if ($status -notmatch "Running") {
             Write-Host "Minikube not running, starting it..."
-            minikube start --driver=hyperv
+            minikube start --driver=hyperv --memory=4g --cpus=2
           } else {
             Write-Host "Minikube already running."
           }
-          kubectl config use-context minikube  
+          kubectl config use-context minikube
 
       - name: Update Kubernetes Deployment
         shell: powershell
