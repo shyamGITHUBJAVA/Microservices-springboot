@@ -59,10 +59,15 @@ jobs:
           kubectl config use-context minikube  
 
       - name: Update Kubernetes Deployment
+        shell: powershell
         run: |
-          kubectl set image deployment/springboot-example springboot-example=shyam583/service-inventory:latest || \
-          (kubectl create deployment springboot-example --image=shyam583/service-inventory:latest && \
-          kubectl expose deployment springboot-example --type=NodePort --port=8082 --target-port=8082)
+          $deployment = kubectl get deployment springboot-example --ignore-not-found
+          if (-not $deployment) {
+            kubectl create deployment springboot-example --image=shyam583/service-inventory:latest
+            kubectl expose deployment springboot-example --type=NodePort --port=8082 --target-port=8082
+          } else {
+            kubectl set image deployment/springboot-example springboot-example=shyam583/service-inventory:latest
+          }
 
       - name: Show Service URL
         run: minikube service springboot-example --url
