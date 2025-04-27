@@ -23,7 +23,7 @@ public class InventoryController {
 
     @GetMapping("/hello")
     public String helloMethod(){
-        return "hello from app and kubernetes is working fine";
+        return "hello from app and kubernetes";
     }
 
     @PostMapping("/reserve")
