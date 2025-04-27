@@ -43,13 +43,17 @@ jobs:
         shell: powershell
         run: |
           $status = minikube status
-          if ($status -notmatch "Running") {
-              Write-Host "Minikube not running, starting it..."
+          $hostStatus = ($status | Select-String "host:").ToString()
+          $kubeletStatus = ($status | Select-String "kubelet:").ToString()
+          $apiserverStatus = ($status | Select-String "apiserver:").ToString()
+
+          if ($hostStatus -notmatch "Running" -or $kubeletStatus -notmatch "Running" -or $apiserverStatus -notmatch "Running") {
+              Write-Host "Minikube not fully running, starting it..."
               minikube start --driver=hyperv
           } else {
               Write-Host "Minikube already running."
           }
-          
+
           # Ensure kubectl is using Minikube context
           try {
               kubectl config use-context minikube
@@ -62,7 +66,7 @@ jobs:
         run: |
           $deployment = kubectl get deployment springboot-example --ignore-not-found
           if (-not $deployment) {
-              kubectl create deployment springboot-example --image=shyam583/service-inventory:latest
+              kubectl create deployment springboot-example --image=shyam583/service-inventory:latest --replicas=2
               kubectl expose deployment springboot-example --type=NodePort --port=8082 --target-port=8082
           } else {
               kubectl set image deployment/springboot-example service-inventory=shyam583/service-inventory:latest
